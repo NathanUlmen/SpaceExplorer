@@ -30,6 +30,10 @@ class Drone:
         d.target_planet = None
         return d
 
+    def set_course(self, planet : Planet) -> None:
+        self.target_planet = planet
+        self.target_pos = planet.pos
+
 
 class World:
     def __init__(self):

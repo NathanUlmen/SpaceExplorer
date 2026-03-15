@@ -14,30 +14,20 @@ camera = Camera(dimensions.x, dimensions.y)
 world = World()
 
 
-def spawn_planets() -> None:
-    for i in range(0, 5):
-        for j in range(12):
-            color = Vector3(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-            pos = Vector2(i * 100, j * 100)
-            world.planets.append(Planet(color, pos))
-
-
 def main() -> None:
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(dimensions)
     pygame.display.set_caption("Space Explorer")
 
-    spawn_planets()
-    p = Planet(Vector3(200, 200, 0), Vector2(200, 200))
-    world.planets.append(p)
+    spawn_planets(1000)
 
     d = Drone()
-    d.target_pos = Vector2(900, 900)
-    d.target_planet = p
-    d.target_pos = p.pos
+    target = world.nearest_planet(d.pos)
+    d.set_course(target)
     world.add_drone(d)
 
+    # Game loop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -48,6 +38,14 @@ def main() -> None:
         tick(delta, world)
         draw(screen, world)
         pygame.display.flip()
+
+
+def spawn_planets(count: int) -> None:
+    for i in range(count):
+        color = Vector3(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        pos = Vector2(random.uniform(0, dimensions.x), random.uniform(0, dimensions.y))
+        planet = Planet(color, pos)
+        world.add_planet(planet)
 
 
 def tick(delta: float, world: World) -> None:
