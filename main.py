@@ -22,6 +22,7 @@ def main() -> None:
 
     spawn_planets(1000)
 
+    # Create first drone
     d = Drone()
     target = world.nearest_planet(d.pos)
     d.set_course(target)
@@ -49,18 +50,16 @@ def spawn_planets(count: int) -> None:
 
 
 def tick(delta: float, world: World) -> None:
-    for ship in world.drones:
-        if not ship.target_pos or not ship.target_planet:
+    for drone in world.drones:
+        if not drone.target_pos or not drone.target_planet:
             continue
-        # Update velocity
-        ship.velocity = Vector2(40, 40) * delta
-        ship.pos = ship.pos.move_towards(ship.target_pos, ship.velocity.length())
-        if ship.pos == ship.target_pos:
-            ship.target_planet.explored = True
+        drone.pos = drone.pos.move_towards(drone.target_pos, drone.speed * delta)
+        if drone.pos == drone.target_pos:
+            drone.target_planet.explored = True
             # Replicate and find next planet
-            replicant = ship.replicate()
+            replicant = drone.replicate()
             world.add_drone(replicant)
-            find_next_planet(ship, world)
+            find_next_planet(drone, world)
             find_next_planet(replicant, world)
     world.drones.flush()
 

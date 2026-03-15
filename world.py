@@ -15,8 +15,8 @@ class Planet:
 
 class Drone:
     def __init__(self):
+        self.speed = 100
         self.pos = Vector2()
-        self.velocity = Vector2()
         self.target_pos = Vector2()
         self.target_planet = None
         self.color = Vector3(200, 155, 200)
@@ -24,7 +24,6 @@ class Drone:
     def replicate(self):
         d = Drone()
         d.pos = self.pos.copy()
-        d.velocity = self.velocity.copy()
         d.target_pos = self.target_pos.copy()
         d.color = self.color.copy()
         d.target_planet = None
