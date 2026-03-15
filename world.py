@@ -15,7 +15,7 @@ class Planet:
 
 class Drone:
     def __init__(self):
-        self.speed = 100
+        self.speed = 120
         self.pos = Vector2()
         self.target_pos = Vector2()
         self.target_planet = None
@@ -39,6 +39,7 @@ class World:
         self.available_planets = []
         self.planets = []
         self.drones = StagedCollection()
+        self.markers = StagedCollection()
 
     def add_drone(self, drone: Drone):
         self.drones.stage_append(drone)
@@ -47,7 +48,7 @@ class World:
         self.planets.append(planet)
         self.available_planets.append(planet)
 
-    def nearest_planet(self, position: Vector2) -> Planet | None:
+    def pop_nearest_planet(self, position: Vector2) -> Planet | None:
         if len(self.available_planets) == 0:
             return None
         smallest_dist = sys.maxsize

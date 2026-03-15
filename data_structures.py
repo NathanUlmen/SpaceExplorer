@@ -28,9 +28,16 @@ class StagedCollection:
         self.to_add = []
         self.to_remove = []
 
+    def __len__(self):
+        return len(self.elements)
+
     def flush(self):
-        # self.elements -= self.to_remove
-        # self.to_remove.clear()
+        # Remove
+        for element in self.to_remove:
+            self.elements.remove(element)
+        self.to_remove.clear()
+
+        # Add
         self.elements += self.to_add
         self.to_add.clear()
 
