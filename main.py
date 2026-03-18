@@ -6,7 +6,7 @@ import pygame
 from pygame.math import Vector2, Vector3
 
 from camera import Camera
-from world import World, Planet, Drone
+from world import World, Planet, Drone, TrailPoint
 
 screen_dims = Vector2(1600, 800)
 
@@ -24,7 +24,7 @@ def main() -> None:
     screen = pygame.display.set_mode(screen_dims)
     pygame.display.set_caption("Space Explorer")
 
-    spawn_planets(10_000)
+    spawn_planets(1_000)
 
     # Create first drone
     d = Drone()
@@ -66,6 +66,7 @@ def main() -> None:
                 if event.key == pygame.K_MINUS:
                     zoom_at(camera.center, 1 / 1.1, zoom_min, zoom_max)
         delta = clock.tick(60) / 1000
+        delta *= 2
         screen.fill((0, 0, 0))
         tick(delta, world)
         draw(screen, world)
@@ -85,6 +86,10 @@ def tick(delta: float, world: World) -> None:
         if not drone.target_pos or not drone.target_planet:
             continue
         drone.pos = drone.pos.move_towards(drone.target_pos, drone.speed * delta)
+        # Every 5 units plot a dot
+        if (drone.pos - drone.last_point).length() > 50:
+            drone.last_point = drone.pos.copy()
+            world.trails.append(TrailPoint(drone.color, drone.pos.copy()))
         if drone.pos == drone.target_pos and len(world.available_planets) > 0:
             drone.target_planet.explored = True
             # Replicate and find next planet
@@ -95,7 +100,7 @@ def tick(delta: float, world: World) -> None:
     world.drones.flush()
 
 
-def find_next_planet(drone: Drone, world: World):
+def find_next_planet(drone: Drone, world: World) -> None:
     target = world.pop_nearest_planet(drone.pos)
     if not target:
         return
@@ -104,11 +109,15 @@ def find_next_planet(drone: Drone, world: World):
     drone.target_pos = target.pos
 
 
-def draw(screen, world) -> None:
+def draw(screen, world: World) -> None:
     for drone in world.drones:
         draw_ship(screen, drone)
     for planet in world.planets:
         draw_planet(screen, planet)
+    for dot in world.trails:
+        pygame.draw.circle(screen, dot.color, camera.world_to_screen(dot.pos), dot.radius)
+
+
 
 
 ship_shape = [Vector2(0, -5), Vector2(-2, 2), Vector2(0, 1), Vector2(2, 2)]

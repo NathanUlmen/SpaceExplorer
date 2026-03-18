@@ -1,4 +1,5 @@
 import sys
+import random
 
 from pygame.math import Vector2, Vector3
 
@@ -19,19 +20,27 @@ class Drone:
         self.pos = Vector2()
         self.target_pos = Vector2()
         self.target_planet = None
+        self.last_point = Vector2()
         self.color = Vector3(200, 155, 200)
 
     def replicate(self):
         d = Drone()
         d.pos = self.pos.copy()
         d.target_pos = self.target_pos.copy()
-        d.color = self.color.copy()
+        d.color = Vector3(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         d.target_planet = None
         return d
 
-    def set_course(self, planet : Planet) -> None:
+    def set_course(self, planet: Planet) -> None:
         self.target_planet = planet
         self.target_pos = planet.pos
+
+
+class TrailPoint:
+    def __init__(self, color: Vector3, pos: Vector2):
+        self.color = color
+        self.pos = pos
+        self.radius = 5
 
 
 class World:
@@ -40,6 +49,7 @@ class World:
         self.planets = []
         self.drones = StagedCollection()
         self.markers = StagedCollection()
+        self.trails = []
 
     def add_drone(self, drone: Drone):
         self.drones.stage_append(drone)
