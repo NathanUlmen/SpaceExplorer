@@ -16,7 +16,7 @@ class Planet:
 
 class Drone:
     def __init__(self):
-        self.speed = 120
+        self.speed = 80
         self.pos = Vector2()
         self.target_pos = Vector2()
         self.target_planet = None

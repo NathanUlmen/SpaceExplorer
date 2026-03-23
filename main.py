@@ -10,7 +10,7 @@ from world import World, Planet, Drone, TrailPoint
 
 screen_dims = Vector2(1600, 800)
 
-world_dims = Vector2(screen_dims * 10)
+world_dims = Vector2(screen_dims * 100)
 world_center = world_dims / 2
 
 camera = Camera(screen_dims.x, screen_dims.y)
@@ -35,7 +35,7 @@ def main() -> None:
 
     is_panning = False
     last_mouse = Vector2(0, 0)
-    zoom_min = 0.2
+    zoom_min = 0.002
     zoom_max = 5.0
 
     # Game loop
@@ -66,7 +66,6 @@ def main() -> None:
                 if event.key == pygame.K_MINUS:
                     zoom_at(camera.center, 1 / 1.1, zoom_min, zoom_max)
         delta = clock.tick(60) / 1000
-        delta *= 2
         screen.fill((0, 0, 0))
         tick(delta, world)
         draw(screen, world)
