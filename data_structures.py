@@ -1,3 +1,6 @@
+import math
+from typing import Any
+
 from pygame.math import Vector2
 
 
@@ -20,6 +23,47 @@ class AABB:
                 self.max.y < other.min.y or
                 self.min.y > other.max.y
         )
+
+
+class HashGrid:
+    def __init__(self):
+        self.buckets: dict[Vector2, list[Any]] = {}
+        self.size = 0
+
+    def update(self, element) -> None:
+        self.remove(element)
+        self.insert(element)
+
+    def insert(self, element) -> None:
+        self._assert_check(element)
+        floored = Vector2(math.floor(element.pos.x), math.floor(element.pos.y))
+        self.buckets[floored].append(element)
+
+    def remove(self, element) -> bool:
+        self._assert_check(element)
+        for cell in self.buckets.values():
+            if element in cell:
+                cell.remove(element)
+                return True
+        return False
+
+    def query(self, target: Vector2 | AABB) -> list[Any] | None:
+        if isinstance(target, Vector2):
+            floored = Vector2(math.floor(target.x), math.floor(target.y))
+            return self.buckets[floored]
+        elif isinstance(target, AABB):
+            to_return = []
+            for i in range(math.floor(target.min.x), math.floor(target.max.x)):
+                for j in range(math.floor(target.min.y), math.floor(target.max.y)):
+                    result = self.query(Vector2(i, j))
+                    if result and len(result) > 0:
+                        to_return += result
+            return to_return
+        return None
+
+    @staticmethod
+    def _assert_check(element) -> None:
+        assert element and element.pos and isinstance(element.pos, Vector2)
 
 
 class StagedCollection:

@@ -7,7 +7,7 @@ from data_structures import KdTree, AABB, StagedCollection
 
 
 class Planet:
-    def __init__(self, color: Vector3, pos: Vector2 = Vector2(0, 0), radius: float = 10):
+    def __init__(self, color: Vector3, pos: Vector2 = Vector2(0, 0), radius: float = 40):
         self.glow_pulse = random.uniform(0, 1)
         self.glow_radius = random.uniform(radius, radius * 2) + radius
         self.color = color

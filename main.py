@@ -67,6 +67,7 @@ def main() -> None:
                 if event.key == pygame.K_MINUS:
                     zoom_at(camera.center, 1 / 1.1, zoom_min, zoom_max)
         delta = clock.tick(60) / 1000
+        delta *= 10
         screen.fill((0, 0, 0))
         tick(delta, world)
         draw(screen, world)
@@ -153,11 +154,11 @@ def draw_planet(screen, planet: Planet) -> None:
 
     # draw glow effect
     surface = pygame.Surface((glow_radius * 2, glow_radius * 2), SRCALPHA)
-    glow_rate = .1
+    glow_rate = .0001
     # update glow pulse
     planet.glow_pulse += glow_rate * (1000 / 16)
-    glow_strength = (math.sin(planet.glow_pulse) + 2) * 60
-    glow_color = (*planet.color, glow_strength)
+    glow_strength = (math.sin((2 * math.pi * planet.glow_pulse)) * 0.5) + 0.5
+    glow_color = (*planet.color, glow_strength * 255)
     pygame.draw.circle(surface, glow_color, (glow_radius, glow_radius), glow_radius)
 
     # draw solar system
