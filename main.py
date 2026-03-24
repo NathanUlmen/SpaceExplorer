@@ -3,6 +3,7 @@ import random
 import sys
 
 import pygame
+from pygame.constants import SRCALPHA
 from pygame.math import Vector2, Vector3
 
 from camera import Camera
@@ -117,8 +118,6 @@ def draw(screen, world: World) -> None:
         pygame.draw.circle(screen, dot.color, camera.world_to_screen(dot.pos), dot.radius)
 
 
-
-
 ship_shape = [Vector2(0, -5), Vector2(-2, 2), Vector2(0, 1), Vector2(2, 2)]
 
 
@@ -150,6 +149,19 @@ def draw_ship(screen, drone: Drone) -> None:
 def draw_planet(screen, planet: Planet) -> None:
     pos = camera.world_to_screen(planet.pos)
     radius = max(1, int(planet.radius * camera.zoom))
+    glow_radius = max(radius + 2, int(planet.glow_radius * camera.zoom))
+
+    # draw glow effect
+    surface = pygame.Surface((glow_radius * 2, glow_radius * 2), SRCALPHA)
+    glow_rate = .1
+    # update glow pulse
+    planet.glow_pulse += glow_rate * (1000 / 16)
+    glow_strength = (math.sin(planet.glow_pulse) + 2) * 60
+    glow_color = (*planet.color, glow_strength)
+    pygame.draw.circle(surface, glow_color, (glow_radius, glow_radius), glow_radius)
+
+    # draw solar system
+    screen.blit(surface, (pos.x - glow_radius, pos.y - glow_radius))
     pygame.draw.circle(screen, planet.color, pos, radius)
 
 
