@@ -38,10 +38,11 @@ class Drone:
         self.target_pos = planet.pos
 
 
-class TrailPoint:
-    def __init__(self, color: Vector3, pos: Vector2):
+class Trail:
+    def __init__(self, color: Vector3, start_pos: Vector2, end_pos: Vector2):
         self.color = color
-        self.pos = pos
+        self.pos = start_pos
+        self.end_pos = end_pos
         self.radius = 5
 
 

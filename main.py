@@ -7,7 +7,7 @@ from pygame.constants import SRCALPHA
 from pygame.math import Vector2, Vector3
 
 from camera import Camera
-from world import World, Planet, Drone, TrailPoint
+from world import World, Planet, Drone, Trail
 
 screen_dims = Vector2(1600, 800)
 
@@ -87,17 +87,17 @@ def tick(delta: float, world: World) -> None:
         if not drone.target_pos or not drone.target_planet:
             continue
         drone.pos = drone.pos.move_towards(drone.target_pos, drone.speed * delta)
-        # Every 5 units plot a dot
-        if (drone.pos - drone.last_point).length() > 50:
-            drone.last_point = drone.pos.copy()
-            world.trails.append(TrailPoint(drone.color, drone.pos.copy()))
         if drone.pos == drone.target_pos and len(world.available_planets) > 0:
             drone.target_planet.explored = True
-            # Replicate and find next planet
+
+            find_next_planet(drone, world)
+            trail1 = Trail(drone.color, drone.pos.copy(), drone.target_pos.copy())
+            world.trails.append(trail1)
+
             replicant = drone.replicate()
             world.add_drone(replicant)
-            find_next_planet(drone, world)
             find_next_planet(replicant, world)
+            world.trails.append(Trail(replicant.color, replicant.pos.copy(), replicant.target_pos.copy()))
     world.drones.flush()
 
 
@@ -115,8 +115,10 @@ def draw(screen, world: World) -> None:
         draw_ship(screen, drone)
     for planet in world.planets:
         draw_planet(screen, planet)
-    for dot in world.trails:
-        pygame.draw.circle(screen, dot.color, camera.world_to_screen(dot.pos), dot.radius)
+    for trail in world.trails:
+        start = camera.world_to_screen(trail.pos)
+        end = camera.world_to_screen(trail.end_pos)
+        pygame.draw.line(screen, trail.color, start, end)
 
 
 ship_shape = [Vector2(0, -5), Vector2(-2, 2), Vector2(0, 1), Vector2(2, 2)]
@@ -144,7 +146,7 @@ def draw_ship(screen, drone: Drone) -> None:
 
     # Draw line to destination
     pygame.draw.line(screen, drone.color, camera.world_to_screen(drone.pos), camera.world_to_screen(drone.target_pos),
-                     2)
+                     3)
 
 
 def draw_planet(screen, planet: Planet) -> None:
@@ -157,7 +159,7 @@ def draw_planet(screen, planet: Planet) -> None:
     glow_rate = .0001
     # update glow pulse
     planet.glow_pulse += glow_rate * (1000 / 16)
-    glow_strength = (math.sin((2 * math.pi * planet.glow_pulse)) * 0.5) + 0.5
+    glow_strength = (math.sin((math.tau * planet.glow_pulse)) * 0.5) + 0.5
     glow_color = (*planet.color, glow_strength * 255)
     pygame.draw.circle(surface, glow_color, (glow_radius, glow_radius), glow_radius)
 
