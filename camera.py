@@ -1,5 +1,7 @@
 from pygame import Vector2
 
+from data_structures import AABB
+
 
 class Camera:
     def __init__(self, width: float, height: float):
@@ -12,3 +14,8 @@ class Camera:
 
     def screen_to_world(self, pos: Vector2) -> Vector2:
         return (pos - self.center) / self.zoom + self.position
+
+    def view_frustum(self) -> AABB:
+        bottom_left = self.position - self.center / self.zoom
+        top_right = self.position + self.center / self.zoom
+        return AABB(bottom_left, top_right)

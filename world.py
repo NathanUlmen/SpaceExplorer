@@ -1,9 +1,10 @@
 import sys
 import random
+from pickletools import optimize
 
 from pygame.math import Vector2, Vector3
 
-from data_structures import KdTree, AABB, StagedCollection
+from data_structures import KdTree, AABB, StagedCollection, HashGrid
 
 
 class Planet:
@@ -47,19 +48,31 @@ class Trail:
 
 
 class World:
-    def __init__(self):
-        self.available_planets = []
-        self.planets = []
+    def __init__(self, world_size: Vector2, optimized: bool = True):
+        self.optimized = optimized
+        if optimized:
+            self.drawables = HashGrid(world_size / 100)
+            self.available_planets = []
+        else:
+            self.drawables = []
+            self.available_planets = []
         self.drones = StagedCollection()
-        self.markers = StagedCollection()
         self.trails = []
 
     def add_drone(self, drone: Drone):
+        self._add(drone)
         self.drones.stage_append(drone)
 
     def add_planet(self, planet: Planet):
-        self.planets.append(planet)
+        self._add(planet)
         self.available_planets.append(planet)
+
+    def update_drone(self, drone: Drone) -> None:
+        if self.optimized:
+            self.drawables.update(drone)
+
+    def query_drawables(self, aabb: AABB) -> list:
+        return self.drawables.query(aabb) if self.optimized else self.drawables
 
     def pop_nearest_planet(self, position: Vector2) -> Planet | None:
         if len(self.available_planets) == 0:
@@ -73,3 +86,9 @@ class World:
                 target = planet
         self.available_planets.remove(target)
         return target
+
+    def _add(self, element) -> None:
+        if self.optimized:
+            self.drawables.insert(element)
+        else:
+            self.drawables.append(element)

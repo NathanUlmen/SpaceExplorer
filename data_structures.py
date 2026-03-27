@@ -26,9 +26,11 @@ class AABB:
 
 
 class HashGrid:
-    def __init__(self):
+    def __init__(self, cell_dims: Vector2):
         self.buckets: dict[tuple[int, int], list[Any]] = {}
+        self.cells: dict[Any, tuple[int, int]] = {}
         self.size = 0
+        self.cell_size = cell_dims
 
     def update(self, element) -> None:
         self.remove(element)
@@ -70,10 +72,10 @@ class HashGrid:
             return self.buckets.get(cell, [])
         elif isinstance(target, AABB):
             to_return = []
-            min_x = math.floor(target.min.x)
-            max_x = math.floor(target.max.x)
-            min_y = math.floor(target.min.y)
-            max_y = math.floor(target.max.y)
+            min_x = int(target.min.x // self.cell_size.x)
+            max_x = int(target.max.x // self.cell_size.x)
+            min_y = int(target.min.y // self.cell_size.y)
+            max_y = int(target.max.y // self.cell_size.y)
             for i in range(min_x, max_x + 1):
                 for j in range(min_y, max_y + 1):
                     bucket = self.buckets.get((i, j))
@@ -82,13 +84,12 @@ class HashGrid:
             return to_return
         return None
 
+    def _cell_for_pos(self, pos: Vector2) -> tuple[int, int]:
+        return int(pos.x / self.cell_size.x), int(pos.y / self.cell_size.y)
+
     @staticmethod
     def _assert_check(element) -> None:
         assert element and element.pos and isinstance(element.pos, Vector2)
-
-    @staticmethod
-    def _cell_for_pos(pos: Vector2) -> tuple[int, int]:
-        return math.floor(pos.x), math.floor(pos.y)
 
 
 class StagedCollection:
