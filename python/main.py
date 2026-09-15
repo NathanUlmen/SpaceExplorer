@@ -25,7 +25,7 @@ def main() -> None:
     screen = pygame.display.set_mode(screen_dims)
     pygame.display.set_caption("Space Explorer")
 
-    spawn_planets(10_000)
+    spawn_planets(50_000)
 
     # Create first drone
     d = Drone()
@@ -45,6 +45,8 @@ def main() -> None:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.MOUSEWHEEL:
+                zoom_at(Vector2(pygame.mouse.get_pos()), 1.1 ** event.y, zoom_min, zoom_max)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 2 or event.button == 3:
                     is_panning = True
@@ -67,10 +69,12 @@ def main() -> None:
                 if event.key == pygame.K_MINUS:
                     zoom_at(camera.center, 1 / 1.1, zoom_min, zoom_max)
         delta = clock.tick(60) / 1000
+        print(f"FPS: {clock.get_fps():.1f}, frame time: {clock.get_time():.2f} ms")
         delta *= 10
         screen.fill((0, 0, 0))
         tick(delta, world)
         draw(screen, world)
+        print("FPS:", clock.get_fps())
         pygame.display.flip()
 
 
